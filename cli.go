@@ -33,6 +33,25 @@ func main() {
 					return nil
 				},
 			},
+			{
+				Name:    "backup",
+				Aliases: []string{"b"},
+				Usage:   "备份当前 pigeon-oj 的数据",
+				Action: func(cCtx *cli.Context) error {
+					fmt.Println("completed task: ", cCtx.Args().First())
+					return nil
+				},
+				Subcommands: []*cli.Command{
+					{
+						Name:  "hustoj",
+						Usage: "备份 hustoj 的数据",
+						Action: func(cCtx *cli.Context) error {
+							fmt.Println("new task template: ", cCtx.Args().First())
+							return nil
+						},
+					},
+				},
+			},
 		},
 	}
 
