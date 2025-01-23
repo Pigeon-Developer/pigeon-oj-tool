@@ -6,29 +6,30 @@ import (
 	"os/exec"
 
 	"github.com/Pigeon-Developer/pigeon-oj-tool/shared"
+	"github.com/Pigeon-Developer/pigeon-oj-tool/shared/config"
 	"github.com/Pigeon-Developer/pigeon-oj-tool/shared/content"
 	"github.com/Pigeon-Developer/pigeon-oj-tool/shared/dependency"
-	"github.com/go-ini/ini"
 	"github.com/nleeper/goment"
+	"github.com/pterm/pterm"
 )
 
 func RunHustoj() {
 	// https://github.com/zhblue/hustoj/blob/master/trunk/install/bak.sh
 
-	cfg, err := ini.LoadSources(ini.LoadOptions{
-		SkipUnrecognizableLines: true,
-	}, shared.HustojConfPath)
+	step1, _ := pterm.DefaultSpinner.Start("读取 hustoj 配置...")
+	cfg, err := config.LoadHustojConfig()
 
 	if err != nil {
-		fmt.Println("hustoj 配置文件读取失败 ", err)
+		step1.Fail("hustoj 配置文件读取失败 ", err)
 		return
 	}
+	step1.Success()
 
-	dbHost := cfg.Section("").Key("OJ_HOST_NAME").String()
-	dbUser := cfg.Section("").Key("OJ_USER_NAME").String()
-	dbPasswd := cfg.Section("").Key("OJ_PASSWORD").String()
-	dbName := cfg.Section("").Key("OJ_DB_NAME").String()
-	dbPort := cfg.Section("").Key("OJ_PORT_NUMBER").String()
+	dbHost := cfg.OJ_HOST_NAME
+	dbUser := cfg.OJ_USER_NAME
+	dbPasswd := cfg.OJ_PASSWORD
+	dbName := cfg.OJ_DB_NAME
+	dbPort := cfg.OJ_PORT_NUMBER
 
 	// 释放内置的文件到本地
 	content.ExtractStatic()
@@ -50,12 +51,27 @@ func RunHustoj() {
 		return
 	}
 
-	// 之情数据清理的 sql
-	exec.Command("bash", "-l", "-c", fmt.Sprintf("mysql -h %s -u%s -P %s -p%s %s < %s/static/hustoj-backup-clean.sql", dbHost, dbUser, dbPort, dbPasswd, dbName, shared.LocalPath))
+	// 执行数据清理的 sql
+	step2, _ := pterm.DefaultSpinner.Start("清理 db 老旧数据...")
+	step2Result, err := exec.Command("bash", "-l", "-c", fmt.Sprintf("mysql -h %s -u%s -P %s -p%s %s < %s/static/hustoj-backup-clean.sql", dbHost, dbUser, dbPort, dbPasswd, dbName, shared.LocalPath)).CombinedOutput()
+	if err != nil {
+		step2.Fail("清理 db 数据失败 ", err)
+		fmt.Println(string(step2Result))
+		return
+	}
+	step2.Success()
 
 	// 备份 db 文件
-	exec.Command("mysqldump", "--default-character-set=utf8mb4", "-h", dbHost, "-u"+dbUser, "-P", dbPort, "-p"+dbPasswd, dbName, "--result-file", fmt.Sprintf("%s/db.sql", backupDir))
+	step3, _ := pterm.DefaultSpinner.Start("备份 db 数据...")
+	step3Result, err := exec.Command("mysqldump", "--default-character-set=utf8mb4", "-h", dbHost, "-u"+dbUser, "-P", dbPort, "-p"+dbPasswd, dbName, "--result-file", fmt.Sprintf("%s/db.sql", backupDir)).CombinedOutput()
+	if err != nil {
+		step3.Fail("备份 db 数据失败 ", err)
+		fmt.Println(string(step3Result))
+		return
+	}
+	step3.Success()
 
+	step4, _ := pterm.DefaultSpinner.Start("生成备份文件...")
 	backupList := []string{"data", "src/web", "src/core", "etc"}
 
 	for _, path := range backupList {
@@ -64,13 +80,13 @@ func RunHustoj() {
 
 		err = os.MkdirAll(destDir, os.ModePerm)
 		if err != nil {
-			fmt.Println("创建备份目录失败 ", err)
+			step4.Fail("创建备份目录失败 ", err)
 			return
 		}
 
 		err = os.CopyFS(destDir, os.DirFS(srcDir))
 		if err != nil {
-			fmt.Println("复制文件失败 ", err)
+			step4.Fail("复制文件失败 ", err)
 			return
 		}
 	}
@@ -78,7 +94,7 @@ func RunHustoj() {
 	dependency.InstallDepsForDebian([]string{"zstd"})
 
 	// 打包备份目录到 tar.zstd
-	exec.Command("tar", "-I", "zstd", "-cf", fmt.Sprintf("%s.tar.zst", backupDir), backupDir)
+	exec.Command("tar", "-I", "zstd", "-cf", fmt.Sprintf("%s.tar.zst", backupDir), backupDir).Run()
 
-	fmt.Printf("备份完成, 文件名: %s.tar.zst\n", backupDir)
+	step4.Success(fmt.Sprintf("备份完成, 文件名: %s.tar.zst\n", backupDir))
 }

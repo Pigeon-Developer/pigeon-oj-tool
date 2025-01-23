@@ -5,6 +5,7 @@ import (
 	"log"
 	"os"
 
+	"github.com/Pigeon-Developer/pigeon-oj-tool/cmd/backup"
 	"github.com/Pigeon-Developer/pigeon-oj-tool/cmd/install"
 	"github.com/urfave/cli/v2"
 )
@@ -12,8 +13,8 @@ import (
 // 工具默认存放到 /etc/pigeon-oj-tool
 func main() {
 	app := &cli.App{
-		Name:  "pigeon-oj 维护工具",
-		Usage: "检测环境与应用维护",
+		Name:  "pigeon-oj",
+		Usage: "安装升级维护工具",
 		Commands: []*cli.Command{
 			{
 				Name:    "install",
@@ -46,7 +47,7 @@ func main() {
 						Name:  "hustoj",
 						Usage: "备份 hustoj 的数据",
 						Action: func(cCtx *cli.Context) error {
-							fmt.Println("new task template: ", cCtx.Args().First())
+							backup.RunHustoj()
 							return nil
 						},
 					},

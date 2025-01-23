@@ -51,7 +51,7 @@ set
     result = 5
 where
     result < 4
-    and in_date < curdate () - interval 3 day;
+    and in_date < curdate() - interval 3 day;
 
 delete from solution
 where
@@ -61,7 +61,7 @@ where
 --  cleanup trash from 6 month ago
 delete from loginlog
 where
-    time < curdate () - interval 6 month;
+    time < curdate() - interval 6 month;
 
 delete from compileinfo
 where
@@ -72,7 +72,7 @@ where
             solution
         where
             result = 11
-            and in_date < curdate () - interval 6 month
+            and in_date < curdate() - interval 6 month
         order by
             solution_id desc
         limit
@@ -88,7 +88,7 @@ where
             solution
         where
             result = 11
-            and in_date < curdate () - interval 6 month
+            and in_date < curdate() - interval 6 month
         order by
             solution_id desc
         limit
