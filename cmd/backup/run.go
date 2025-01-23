@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
+	"time"
 
 	"github.com/Pigeon-Developer/pigeon-oj-tool/shared"
 	"github.com/Pigeon-Developer/pigeon-oj-tool/shared/config"
@@ -34,7 +35,9 @@ func RunHustoj() {
 	// 释放内置的文件到本地
 	content.ExtractStatic()
 
-	d, err := goment.New()
+	// 展示 +8 时间
+	loc := time.FixedZone("Asia/Shanghai", 8*60*60)
+	d, err := goment.New(time.Now().In(loc))
 
 	if err != nil {
 		fmt.Println("时间获取失败 ", err)
