@@ -11,7 +11,7 @@ import (
 
 	"github.com/Pigeon-Developer/pigeon-oj-tool/shared/util"
 	"github.com/hashicorp/go-version"
-	"github.com/manifoldco/promptui"
+	"github.com/pterm/pterm"
 	"github.com/urfave/cli/v2"
 )
 
@@ -23,12 +23,8 @@ type Option struct {
 func showInstallModeSelect() string {
 	docker := "使用 docker compose"
 	rawNodejs := "直接安装在当前机器（会安装 https://volta.sh 管理 nodejs 版本，使用包管理安装 MySQL 等依赖）"
-	prompt := promptui.Select{
-		Label: "选择安装方式",
-		Items: []string{docker, rawNodejs},
-	}
 
-	_, selected, _ := prompt.Run()
+	selected, _ := pterm.DefaultInteractiveSelect.WithFilter(false).WithOptions([]string{docker, rawNodejs}).Show("选择安装方式")
 
 	if selected == docker {
 		return "docker"
@@ -40,16 +36,7 @@ func showInstallModeSelect() string {
 }
 
 func showInputPrompt(label string, defaultValue string) string {
-	prompt := promptui.Prompt{
-		Label:   label,
-		Default: defaultValue,
-	}
-
-	result, err := prompt.Run()
-	if err != nil {
-		log.Fatalf("Prompt failed %v \n", err)
-	}
-
+	result, _ := pterm.DefaultInteractiveTextInput.WithDefaultText(label).WithDefaultValue(defaultValue).Show()
 	return result
 }
 
