@@ -21,7 +21,7 @@ func main() {
 				Aliases: []string{"i"},
 				Usage:   "安装一个新的 pigeon-oj",
 				Action: func(cCtx *cli.Context) error {
-					install.Run(cCtx)
+					install.Pigeonoj(cCtx)
 					return nil
 				},
 			},
@@ -47,7 +47,7 @@ func main() {
 						Name:  "hustoj",
 						Usage: "备份 hustoj 的数据",
 						Action: func(cCtx *cli.Context) error {
-							backup.RunHustoj()
+							backup.Hustoj()
 							return nil
 						},
 					},

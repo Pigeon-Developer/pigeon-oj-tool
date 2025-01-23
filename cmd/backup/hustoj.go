@@ -14,7 +14,7 @@ import (
 	"github.com/pterm/pterm"
 )
 
-func RunHustoj() {
+func Hustoj() {
 	// https://github.com/zhblue/hustoj/blob/master/trunk/install/bak.sh
 
 	step1, _ := pterm.DefaultSpinner.Start("读取 hustoj 配置...")

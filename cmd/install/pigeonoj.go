@@ -2,23 +2,13 @@ package install
 
 import (
 	"fmt"
-	"log"
 	"os"
 	"os/exec"
-	"regexp"
-	"strconv"
-	"strings"
 
 	"github.com/Pigeon-Developer/pigeon-oj-tool/shared/util"
-	"github.com/hashicorp/go-version"
 	"github.com/pterm/pterm"
 	"github.com/urfave/cli/v2"
 )
-
-type Option struct {
-	Name  string
-	Value string
-}
 
 func showInstallModeSelect() string {
 	docker := "使用 docker compose"
@@ -35,101 +25,20 @@ func showInstallModeSelect() string {
 	return ""
 }
 
-func showInputPrompt(label string, defaultValue string) string {
-	result, _ := pterm.DefaultInteractiveTextInput.WithDefaultText(label).WithDefaultValue(defaultValue).Show()
-	return result
-}
-
-func showNumberInputPrompt(label string, defaultValue int) int {
-	result := showInputPrompt(label, fmt.Sprintf("%d", defaultValue))
-	num, err := strconv.Atoi(result)
-	if err != nil {
-		log.Fatalf("输入的不是数字 %v \n", err)
-	}
-	return num
-}
-
-func handleRawInstall() {
+func handlePigeonojRawInstall() {
 	//
 	fmt.Printf("@TODO \n")
 }
 
-func getDockerVersion() string {
-	version, err := exec.Command("docker", "version", "-f", "{{.Server.Version}}").Output()
-	if err != nil {
-		return ""
-	}
-
-	return strings.Trim(string(version), " \n")
-}
-
-func checkDockerVersion() bool {
-	ver := getDockerVersion()
-
-	if ver == "" {
-		return false
-	}
-
-	baseVersion, err := version.NewVersion("25.0.0")
-
-	if err != nil {
-		log.Fatalf("docker 最小版本解析错误 \n")
-	}
-
-	userVersion, err := version.NewVersion(ver)
-
-	if err != nil {
-		return false
-	}
-
-	return userVersion.GreaterThanOrEqual(baseVersion)
-}
-
-func getComposeVersion() string {
-	out, err := exec.Command("docker", "compose", "version").Output()
-	if err != nil {
-		return ""
-	}
-
-	result := string(out)
-	reg := regexp.MustCompile(` v(\d+\.\d+\.\d+)`)
-	version := reg.FindString(result)
-
-	return strings.Trim(string(version), " \n")
-}
-
-func checkComposeVersion() bool {
-	ver := getComposeVersion()
-	if ver == "" {
-		return false
-	}
-
-	baseVersion, err := version.NewVersion("2.0.0")
-
-	if err != nil {
-		log.Fatalf("docker compose 最小版本解析错误 \n")
-	}
-
-	userVersion, err := version.NewVersion(ver)
-
-	if err != nil {
-		fmt.Println(err)
-
-		return false
-	}
-
-	return userVersion.GreaterThanOrEqual(baseVersion)
-}
-
-func handleDockerInstall() {
+func handlePigeonojDockerInstall() {
 	// 默认安装到 /etc/pigeon-oj
 	// docker 目录存放对应的配置文件
-	if !checkDockerVersion() {
+	if !util.CheckDockerVersion() {
 		fmt.Println("docker 版本不满足 >= 25.0.0 ")
 		return
 	}
 
-	if !checkComposeVersion() {
+	if !util.CheckComposeVersion() {
 		fmt.Println("docker compose 版本不满足 >= 2.0.0 ")
 		return
 	}
@@ -161,7 +70,7 @@ func handleDockerInstall() {
 	}
 
 	imageVersion := "20250120.0214"
-	localPort := showNumberInputPrompt("输入 pigeon-oj 服务端口号", 3000)
+	localPort := util.ShowNumberInputPrompt("输入 pigeon-oj 服务端口号", 3000)
 	composeContent := fmt.Sprintf(`
 services:
   server:
@@ -179,15 +88,15 @@ services:
 	cmd.Run()
 }
 
-func Run(cCtx *cli.Context) {
+func Pigeonoj(cCtx *cli.Context) {
 	mode := showInstallModeSelect()
 
 	if mode == "docker" {
 		// 检查 docker&compose 版本
-		handleDockerInstall()
+		handlePigeonojDockerInstall()
 	}
 	if mode == "raw-nodejs" {
 		// 系统版本，并安装必要的依赖
-		handleRawInstall()
+		handlePigeonojRawInstall()
 	}
 }
