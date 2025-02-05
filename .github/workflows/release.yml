@@ -27,6 +27,12 @@ jobs:
         run: |
           GOOS=linux GOARCH=amd64 go build -o pojt
           tar -zcvf "pojt-${{ steps.get-version.outputs.version }}-linux-amd64.tar.gz" pojt
+          GOOS=linux GOARCH=386 go build -o pojt
+          tar -zcvf "pojt-${{ steps.get-version.outputs.version }}-linux-i386.tar.gz" pojt
+          GOOS=linux GOARCH=arm64 go build -o pojt
+          tar -zcvf "pojt-${{ steps.get-version.outputs.version }}-linux-arm64.tar.gz" pojt
+          GOOS=linux GOARCH=loong64 go build -o pojt
+          tar -zcvf "pojt-${{ steps.get-version.outputs.version }}-linux-loong64.tar.gz" pojt
       - name: Release
         uses: softprops/action-gh-release@v2
         with:
