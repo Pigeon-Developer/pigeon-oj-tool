@@ -173,8 +173,8 @@ install_version() {
   if [ "$?" == 0 ]
   then
     info 'Finished' "installation. Updating bin file link."
-    ln -s "$install_dir"/bin/pjot /usr/local/bin/pjot
-    "$install_dir"/bin/pjot setup
+    ln -s "$install_dir"/bin/pojt /usr/local/bin/pojt
+    "$install_dir"/bin/pojt setup
   fi
 }
 
@@ -263,7 +263,7 @@ do
 done
 
 
-if [ -e /usr/local/bin/pjot ]
+if [ -e /usr/local/bin/pojt ]
 then
     error "pigeon-oj-tool already installed. Please call pojt-updater for upgrade to new version."
     exit 1
