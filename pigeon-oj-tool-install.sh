@@ -186,7 +186,7 @@ install_release() {
   exit_status="$?"
   if [ "$exit_status" != 0 ]
   then
-    error "Could not download pigeon-oj-tool version '$version'. See $(release_url) for a list of available releases"
+    error "Could not download pigeon-oj-tool version '$version'. See $release_url for a list of available releases"
     return "$exit_status"
   fi
 
