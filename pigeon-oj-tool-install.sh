@@ -9,10 +9,6 @@ get_latest_release() {
   curl --silent "https://get.pigeon-oj.cloud/latest-version"
 }
 
-release_url() {
-  echo "https://github.com/Pigeon-Developer/pigeon-oj-tool/releases"
-}
-
 download_release_from_repo() {
   local version="$1"
   local os_info="$2"
@@ -20,7 +16,7 @@ download_release_from_repo() {
 
   local filename="pojt-$version-$os_info.tar.gz"
   local download_file="$tmpdir/$filename"
-  local archive_url="$(release_url)/download/v$version/$filename"
+  local archive_url="$release_url/download/v$version/$filename"
 
   curl --progress-bar --show-error --location --fail "$archive_url" --output "$download_file" --write-out "$download_file"
 }
@@ -177,8 +173,8 @@ install_version() {
   if [ "$?" == 0 ]
   then
     info 'Finished' "installation. Updating bin file link."
-    ln -s "$install_dir"/bin/pigeon-oj-tool /usr/local/bin/pjot
-    "$install_dir"/bin/pigeon-oj-tool setup
+    ln -s "$install_dir"/bin/pjot /usr/local/bin/pjot
+    "$install_dir"/bin/pjot setup
   fi
 }
 
@@ -232,6 +228,9 @@ return 0 2>/dev/null
 # default to installing the latest available version
 version_to_install="latest"
 
+# from github "https://github.com/Pigeon-Developer/pigeon-oj-tool/releases"
+release_url="https://get.pigeon-oj.cloud/pigeon-oj-tool/releases"
+
 # install to POJT_HOME, defaulting to /etc/pigeon-oj-tool
 install_dir="${POJT_HOME:-"/etc/pigeon-oj-tool"}"
 
@@ -250,6 +249,11 @@ do
       version_to_install="$1"
       shift # shift off the value
       ;;
+    --mirror)
+      shift # shift off the argument
+      release_url="$1"
+      shift # shift off the value
+      ;;
     *)
       error "unknown option: '$arg'"
       usage
@@ -257,5 +261,12 @@ do
       ;;
   esac
 done
+
+
+if [ -e /usr/local/bin/pjot ]
+then
+    error "pigeon-oj-tool already installed. Please call pojt-updater for upgrade to new version."
+    exit 1
+fi
 
 install_version "$version_to_install" "$install_dir"

@@ -55,7 +55,7 @@ func main() {
 			},
 			{
 				Name:    "setup",
-				Aliases: []string{"u"},
+				Aliases: []string{"s"},
 				Usage:   "初始化 pigeon-oj-tool 配置",
 				Action: func(cCtx *cli.Context) error {
 					return nil
