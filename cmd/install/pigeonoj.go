@@ -89,6 +89,10 @@ services:
 }
 
 func Pigeonoj(cCtx *cli.Context) {
+	if !util.IsLinux() {
+		fmt.Println("只支持 Linux 系统安装")
+		return
+	}
 	mode := showInstallModeSelect()
 
 	if mode == "docker" {

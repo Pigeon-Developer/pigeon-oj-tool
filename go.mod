@@ -8,6 +8,7 @@ require (
 	github.com/nleeper/goment v1.4.4
 	github.com/pterm/pterm v0.12.80
 	github.com/urfave/cli/v2 v2.27.5
+	periph.io/x/host/v3 v3.8.3
 )
 
 require (

@@ -7,14 +7,16 @@ import (
 
 	"github.com/Pigeon-Developer/pigeon-oj-tool/cmd/backup"
 	"github.com/Pigeon-Developer/pigeon-oj-tool/cmd/install"
+	"github.com/Pigeon-Developer/pigeon-oj-tool/cmd/tool"
+	"github.com/Pigeon-Developer/pigeon-oj-tool/shared/content"
 	"github.com/urfave/cli/v2"
 )
 
 // 工具默认存放到 /etc/pigeon-oj-tool
 func main() {
 	app := &cli.App{
-		Name:  "pigeon-oj",
-		Usage: "安装升级维护工具",
+		Name:  "pojt",
+		Usage: "pigeon-oj 安装升级维护工具",
 		Commands: []*cli.Command{
 			{
 				Name:    "install",
@@ -54,10 +56,30 @@ func main() {
 				},
 			},
 			{
+				Name:    "tool",
+				Aliases: []string{"t"},
+				Usage:   "安装外部依赖",
+				Action: func(cCtx *cli.Context) error {
+					return nil
+				},
+				Subcommands: []*cli.Command{
+					{
+						Name:  "docker",
+						Usage: "安装 docker",
+						Action: func(cCtx *cli.Context) error {
+							tool.DockerInstall()
+							return nil
+						},
+					},
+				},
+			},
+			{
 				Name:    "setup",
 				Aliases: []string{"s"},
 				Usage:   "初始化 pigeon-oj-tool 配置",
 				Action: func(cCtx *cli.Context) error {
+					// 释放静态资源到本地
+					content.ExtractStatic()
 					return nil
 				},
 			},
